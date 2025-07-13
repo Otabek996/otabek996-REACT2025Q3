@@ -1,53 +1,21 @@
 import { Component } from 'react';
-import type { StateCharacter } from '../ts/interfaces/interfaces';
-import { fetchCharacters } from '../api/api';
+import type { Character } from '../ts/interfaces/interfaces';
 import Card from './Card';
-import Loader from './Loader';
 
-class CardSection extends Component<object, StateCharacter> {
-  constructor(props: object) {
-    super(props);
-    this.state = {
-      loading: true,
-      error: null,
-      characters: [],
-    };
-  }
+interface Props {
+  characters: Character[];
+}
 
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  async fetchData() {
-    try {
-      const data = await fetchCharacters();
-      this.setState({ characters: data.results, loading: false });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.setState({ error: error.message, loading: false });
-      } else {
-        this.setState({ error: 'Unknown error', loading: false });
-      }
-    }
-  }
-
+class CardSection extends Component<Props> {
   render() {
-    const { loading, error, characters } = this.state;
-
-    if (loading) {
-      return <Loader />;
-    }
-
-    if (error) {
-      return <div>Error: {error}</div>;
-    }
+    const { characters } = this.props;
 
     if (characters.length === 0) {
-      return <div>No Characters found</div>;
+      return <div className="text-center p-4">No characters found.</div>;
     }
 
     return (
-      <section className="card-section grid grid-cols-4 gap-2">
+      <section className="card-section grid grid-cols-4 gap-2 p-4">
         {characters.map((character) => (
           <Card key={character.id} character={character} />
         ))}
