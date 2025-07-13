@@ -46,7 +46,7 @@ class CardSection extends Component<object, StateCharacter> {
     }
 
     return (
-      <section className="card-section">
+      <section className="card-section grid grid-cols-4 gap-2">
         {characters.map((character) => (
           <Card key={character.id} character={character} />
         ))}
