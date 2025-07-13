@@ -2,6 +2,7 @@ import { Component } from 'react';
 import type { StateCharacter } from '../ts/interfaces/interfaces';
 import { fetchCharacters } from '../api/api';
 import Card from './Card';
+import Loader from './Loader';
 
 class CardSection extends Component<object, StateCharacter> {
   constructor(props: object) {
@@ -34,7 +35,7 @@ class CardSection extends Component<object, StateCharacter> {
     const { loading, error, characters } = this.state;
 
     if (loading) {
-      return <div>Loading...</div>;
+      return <Loader />;
     }
 
     if (error) {
