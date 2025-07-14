@@ -1,0 +1,27 @@
+import { Component } from 'react';
+import type { Character } from '../ts/interfaces/interfaces';
+import Card from './Card';
+
+interface Props {
+  characters: Character[];
+}
+
+class CardSection extends Component<Props> {
+  render() {
+    const { characters } = this.props;
+
+    if (characters.length === 0) {
+      return <div className="text-center p-4">No characters found.</div>;
+    }
+
+    return (
+      <section className="card-section grid grid-cols-4 gap-2 p-4">
+        {characters.map((character) => (
+          <Card key={character.id} character={character} />
+        ))}
+      </section>
+    );
+  }
+}
+
+export default CardSection;
