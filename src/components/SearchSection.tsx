@@ -1,6 +1,6 @@
 import { Component, createRef, type ReactNode } from 'react';
 import { SEARCH_VALUE } from '../constants/consts';
-import Button from './Button';
+import Button from './Button/Button';
 
 interface Props {
   fetchData: (value: string | undefined) => void;
