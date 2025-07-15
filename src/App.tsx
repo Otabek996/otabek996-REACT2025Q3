@@ -3,7 +3,7 @@ import SearchSection from './components/SearchSection';
 import CardSection from './components/CardSection/CardSection';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import ErrorButton from './components/ErrorButton/ErrorButton';
-import Loader from './components/Loader';
+import Loader from './components/Loader/Loader';
 import { fetchCharacters } from './api/api';
 import { type Character } from './ts/interfaces/interfaces';
 import './App.css';
