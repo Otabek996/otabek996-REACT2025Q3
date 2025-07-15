@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import SearchSection from './components/SearchSection';
+import SearchSection from './components/SearchSection/SearchSection';
 import CardSection from './components/CardSection/CardSection';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import ErrorButton from './components/ErrorButton/ErrorButton';
