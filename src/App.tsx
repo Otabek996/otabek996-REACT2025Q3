@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import SearchSection from './components/SearchSection';
-import CardSection from './components/CardSection';
+import CardSection from './components/CardSection/CardSection';
 import ErrorBoundary from './components/ErrorBoundary';
 import ErrorButton from './components/ErrorButton';
 import Loader from './components/Loader';
