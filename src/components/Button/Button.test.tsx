@@ -11,7 +11,9 @@ describe('Button component', () => {
         className="test-button"
       />
     );
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+
+    const buttonText = screen.getByText('Click me');
+    expect(buttonText).toBeInTheDocument();
   });
 
   it('applies the correct className', () => {
@@ -22,7 +24,9 @@ describe('Button component', () => {
         className="my-custom-class"
       />
     );
-    expect(screen.getByRole('button')).toHaveClass('my-custom-class');
+
+    const className = screen.getByRole('button');
+    expect(className).toHaveClass('my-custom-class');
   });
 
   it('calls the callback when clicked', () => {
