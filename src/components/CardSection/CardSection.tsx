@@ -1,6 +1,6 @@
 import { Component } from 'react';
-import type { Character } from '../ts/interfaces/interfaces';
-import Card from './Card';
+import type { Character } from '../../ts/interfaces/interfaces';
+import Card from '../Card/Card';
 
 interface Props {
   characters: Character[];

@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import type { Character } from '../ts/interfaces/interfaces';
+import type { Character } from '../../ts/interfaces/interfaces';
 
 interface Props {
   character: Character;
