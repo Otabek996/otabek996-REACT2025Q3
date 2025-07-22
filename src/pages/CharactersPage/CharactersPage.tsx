@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SearchSection from '../../components/SearchSection/SearchSection';
 import CardSection from '../../components/CardSection/CardSection';
 import ErrorButton from '../../components/ErrorButton/ErrorButton';
@@ -10,28 +11,41 @@ function CharactersPage() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [nextUrl, setNextUrl] = useState<string | null>('');
-  const [prevUrl, setPrevUrl] = useState<string | null>('');
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [prevUrl, setPrevUrl] = useState<string | null>(null);
   const [pages, setPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [baseUrl, setBaseUrl] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  const fetchData = async (searchValue: string | undefined) => {
+  const fetchData = async (
+    searchValue: string | undefined,
+    page: number = 1
+  ) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await fetchCharacters(searchValue);
+
+      let data;
+      const apiBaseUrl = import.meta.env.VITE_RICK_AND_MORTY_BASE_URL;
+
+      if (page === 1 && !searchValue) {
+        data = await fetchCharacters(searchValue);
+      } else {
+        let url = `${apiBaseUrl}/character`;
+        const params = new URLSearchParams();
+
+        if (searchValue) params.append('name', searchValue);
+        if (page > 1) params.append('page', page.toString());
+
+        if (params.toString()) url += `?${params.toString()}`;
+
+        data = await fetchCharactersPagination(url);
+      }
+
       setCharacters(data.results);
       setNextUrl(data.info.next);
       setPrevUrl(data.info.prev);
       setPages(data.info.pages);
-      setCurrentPage(1);
-      const url = import.meta.env.VITE_RICK_AND_MORTY_BASE_URL;
-      setBaseUrl(
-        searchValue
-          ? `${url}/character?name=${searchValue}`
-          : `${url}/character`
-      );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       setCharacters([]);
@@ -39,45 +53,56 @@ function CharactersPage() {
       setNextUrl(null);
       setPrevUrl(null);
       setPages(0);
-      setCurrentPage(1);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePagination = async (url: string, pageNum: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchCharactersPagination(url);
-      setCharacters(data.results);
-      setNextUrl(data.info.next);
-      setPrevUrl(data.info.prev);
-      setPages(data.info.pages);
-      setCurrentPage(pageNum);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      setError(message);
-    } finally {
-      setLoading(false);
+  const updateUrlAndFetch = (pageNumber: number, searchValue?: string) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    if (pageNumber === 1) {
+      newParams.delete('page');
+    } else {
+      newParams.set('page', pageNumber.toString());
     }
+
+    if (searchValue !== undefined) {
+      if (searchValue) {
+        newParams.set('search', searchValue);
+      } else {
+        newParams.delete('search');
+      }
+    }
+
+    setSearchParams(newParams);
   };
 
   const handlePrevClick = () => {
-    if (prevUrl) handlePagination(prevUrl, currentPage - 1);
+    if (prevUrl && currentPage > 1) {
+      const newPage = currentPage - 1;
+      updateUrlAndFetch(newPage);
+    }
   };
 
   const handleNextClick = () => {
-    if (nextUrl) handlePagination(nextUrl, currentPage + 1);
+    if (nextUrl && currentPage < pages) {
+      const newPage = currentPage + 1;
+      updateUrlAndFetch(newPage);
+    }
   };
 
   const handlePageClick = (pageNumber: number) => {
-    if (pageNumber != currentPage) {
-      const pageUrl = baseUrl.includes('?')
-        ? `${baseUrl}$page=${pageNumber}`
-        : `${baseUrl}?page=${pageNumber}`;
+    if (pageNumber !== currentPage && pageNumber >= 1 && pageNumber <= pages) {
+      updateUrlAndFetch(pageNumber);
+    }
+  };
 
-      handlePagination(pageUrl, pageNumber);
+  const handleSearchWithPagination = (searchValue: string | undefined) => {
+    updateUrlAndFetch(1, searchValue);
+
+    if (searchValue !== undefined) {
+      localStorage.setItem('searchValue', searchValue);
     }
   };
 
@@ -121,25 +146,29 @@ function CharactersPage() {
 
   useEffect(() => {
     const savedSearch = localStorage.getItem('searchValue') || '';
-    fetchData(savedSearch);
-  }, []);
+    const searchFromUrl = searchParams.get('search') || savedSearch;
+
+    const pageFromUrl = Math.max(1, currentPage);
+
+    fetchData(searchFromUrl, pageFromUrl);
+  }, [searchParams]);
 
   const pageNumbers = generatePageNumbers();
 
   return (
     <>
-      <SearchSection fetchData={fetchData} />
+      <SearchSection fetchData={handleSearchWithPagination} />
       {loading && <Loader />}
       {error && <div className="text-red-500 text-center">{error}</div>}
       <CardSection characters={characters} />
 
       {pages > 1 && (
-        <div className="flex justify-center gap-2 my-6">
+        <div className="flex justify-center items-center gap-2 my-6">
           <button
             type="button"
             onClick={handlePrevClick}
-            disabled={!prevUrl || loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600"
+            disabled={currentPage === 1 || loading}
+            className="px-3 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
           >
             Prev
           </button>
@@ -149,12 +178,12 @@ function CharactersPage() {
               key={index}
               type="button"
               onClick={() =>
-                typeof pageNum == 'number'
+                typeof pageNum === 'number'
                   ? handlePageClick(pageNum)
                   : undefined
               }
               disabled={loading || pageNum === '...'}
-              className={`px-3 py-2 rounded transition-colors ${
+              className={`px-3 py-2 rounded transition-colors min-w-[40px] ${
                 pageNum === currentPage
                   ? 'bg-blue-600 text-white font-bold'
                   : pageNum === '...'
@@ -169,8 +198,8 @@ function CharactersPage() {
           <button
             type="button"
             onClick={handleNextClick}
-            disabled={!nextUrl || loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600"
+            disabled={currentPage === pages || loading}
+            className="px-3 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
           >
             Next
           </button>
@@ -178,7 +207,7 @@ function CharactersPage() {
       )}
 
       {pages > 1 && (
-        <div className="text-center text-white mb-4">
+        <div className="text-center text-gray-600 mb-4">
           Page {currentPage} of {pages}
         </div>
       )}
