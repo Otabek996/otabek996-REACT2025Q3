@@ -82,3 +82,15 @@ export interface StateLocation extends State {
 export interface StateEpisode extends State {
   episode: Episode[];
 }
+
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  loading?: boolean;
+  showPageInfo?: boolean;
+}
