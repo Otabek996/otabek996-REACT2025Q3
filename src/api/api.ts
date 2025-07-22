@@ -22,3 +22,16 @@ export async function fetchCharacters(
   const data: ApiResponseCharacter = await response.json();
   return data;
 }
+
+export async function fetchCharactersPagination(
+  url: string
+): Promise<ApiResponseCharacter> {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const data: ApiResponseCharacter = await response.json();
+  return data;
+}
