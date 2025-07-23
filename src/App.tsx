@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
+import PageNotFound from './pages/404/404';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import './App.css';
@@ -11,7 +12,7 @@ function App() {
   const routes = [
     {
       path: '*',
-      element: <h1>404 - Page Not Found</h1>,
+      element: <PageNotFound />,
     },
     {
       path: '/otabek996-REACT2025Q3',
