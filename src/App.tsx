@@ -2,6 +2,7 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import { Routes, Route } from 'react-router-dom';
 import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
+import AboutPage from './pages/AboutPage/AboutPage';
 import './App.css';
 
 function App() {
@@ -17,6 +18,10 @@ function App() {
     {
       path: '/otabek996-REACT2025Q3/characters',
       element: <CharactersPage />,
+    },
+    {
+      path: '/otabek996-REACT2025Q3/about',
+      element: <AboutPage />,
     },
   ];
 
