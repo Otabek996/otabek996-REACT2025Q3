@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
+import Navbar from './components/Navbar/Navbar';
 import './App.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <Navbar />
       <Routes>
         {routes.map((route, index) => (
           <Route key={index} path={route.path} element={route.element} />
