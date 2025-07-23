@@ -1,3 +1,5 @@
+import { NavLink } from 'react-router-dom';
+
 function Navbar() {
   const links = [
     {
@@ -15,14 +17,16 @@ function Navbar() {
   ];
 
   return (
-    <div className="navbar">
-      <ul>
-        {links.map((link, index) => (
-          <li key={index}>
-            <a href={link.link}>{link.text}</a>
-          </li>
-        ))}
-      </ul>
+    <div className="navbar fixed top-0 left-0 w-full">
+      <div className="max-w-7xl mx-auto p-4">
+        <ul className="flex space-x-6 py-2">
+          {links.map((link, index) => (
+            <li key={index} className="text-white">
+              <NavLink to={link.link}>{link.text}</NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
