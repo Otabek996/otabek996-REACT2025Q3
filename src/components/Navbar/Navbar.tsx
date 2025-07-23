@@ -17,7 +17,7 @@ function Navbar() {
   ];
 
   return (
-    <div className="navbar fixed top-0 left-0 w-full">
+    <div className="navbar w-full bg-[#121212]">
       <div className="max-w-7xl mx-auto p-4">
         <ul className="flex space-x-6 py-2">
           {links.map((link, index) => (
