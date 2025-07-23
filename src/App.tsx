@@ -4,6 +4,7 @@ import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import Navbar from './components/Navbar/Navbar';
+import Footer from './components/Footer/Footer';
 import './App.css';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <Route key={index} path={route.path} element={route.element} />
         ))}
       </Routes>
+      <Footer />
     </ErrorBoundary>
   );
 }
