@@ -1,3 +1,4 @@
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Character } from '../../ts/interfaces/interfaces';
 
 interface Props {
@@ -5,8 +6,24 @@ interface Props {
 }
 
 function Card({ character }: Props) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const handleOpenCard = () => {
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
+    if (character.id <= 20) {
+      navigate(`?details=${character.id}`);
+    } else {
+      navigate(`?page=${currentPage}&details=${character.id}`);
+    }
+  };
+
   return (
-    <div className="card bg-[#1E1E1E] rounded-2xl m-4">
+    <div
+      className="card bg-[#1E1E1E] rounded-2xl m-4 cursor-pointer"
+      onClick={handleOpenCard}
+    >
       <img
         className="card-img rounded-t-2xl"
         src={character.image}

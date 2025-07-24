@@ -1,5 +1,5 @@
-// import { Component } from 'react';
 import type { Character } from '../../ts/interfaces/interfaces';
+import { Outlet } from 'react-router-dom';
 import Card from '../Card/Card';
 
 interface Props {
@@ -12,10 +12,15 @@ function CardSection({ characters }: Props) {
   }
 
   return (
-    <section className="card-section grid grid-cols-4 gap-2 p-4">
-      {characters.map((character) => (
-        <Card key={character.id} character={character} />
-      ))}
+    <section className="flex">
+      <div className="card-section grid grid-cols-4 gap-2 p-4">
+        {characters.map((character) => (
+          <Card key={character.id} character={character} />
+        ))}
+      </div>
+      <div>
+        <Outlet />
+      </div>
     </section>
   );
 }

@@ -5,7 +5,6 @@ import CardSection from '../../components/CardSection/CardSection';
 import ErrorButton from '../../components/ErrorButton/ErrorButton';
 import Loader from '../../components/Loader/Loader';
 import Pagination from '../../components/Pagination/Pagination';
-import { Outlet } from 'react-router-dom';
 import { fetchCharacters, fetchCharactersPagination } from '../../api/api';
 import { type Character } from '../../ts/interfaces/interfaces';
 
@@ -67,6 +66,7 @@ function CharactersPage() {
     if (pageNumber === 1) {
       newParams.delete('page');
     } else {
+      newParams.delete('details');
       newParams.set('page', pageNumber.toString());
     }
 
@@ -114,27 +114,23 @@ function CharactersPage() {
   }, [searchParams]);
 
   return (
-    <div className="flex">
-      <div>
-        <SearchSection fetchData={handleSearch} />
-        {loading && <Loader />}
-        {error && <div className="text-red-500 text-center my-4">{error}</div>}
-        <CardSection characters={characters} />
-        <Pagination
-          currentPage={currentPage}
-          totalPages={pages}
-          onPageChange={handlePageChange}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          hasNext={!!nextUrl}
-          hasPrevious={!!prevUrl}
-          loading={loading}
-          showPageInfo={true}
-        />
-        <ErrorButton />
-      </div>
-
-      <Outlet />
+    <div>
+      <SearchSection fetchData={handleSearch} />
+      {loading && <Loader />}
+      {error && <div className="text-red-500 text-center my-4">{error}</div>}
+      <CardSection characters={characters} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={pages}
+        onPageChange={handlePageChange}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        hasNext={!!nextUrl}
+        hasPrevious={!!prevUrl}
+        loading={loading}
+        showPageInfo={true}
+      />
+      <ErrorButton />
     </div>
   );
 }

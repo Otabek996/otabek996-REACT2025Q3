@@ -4,7 +4,7 @@ import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import PageNotFound from './pages/404/404';
-import Sidebar from './components/Sidebar/Sidebar';
+import CharacterDetail from './components/CharacterDetail/CharacterDetail';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import './App.css';
@@ -37,7 +37,7 @@ function App() {
           if (route.path === '/otabek996-REACT2025Q3/characters') {
             return (
               <Route key={index} path={route.path} element={route.element}>
-                <Route path="character" element={<Sidebar />} />
+                <Route path="character/:id" element={<CharacterDetail />} />
               </Route>
             );
           } else {
