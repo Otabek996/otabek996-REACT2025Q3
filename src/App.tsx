@@ -14,18 +14,28 @@ function App() {
     {
       path: '*',
       element: <PageNotFound />,
+      children: [],
     },
     {
       path: '/otabek996-REACT2025Q3',
       element: <HomePage />,
-    },
-    {
-      path: '/otabek996-REACT2025Q3/characters',
-      element: <CharactersPage />,
+      children: [],
     },
     {
       path: '/otabek996-REACT2025Q3/about',
       element: <AboutPage />,
+      children: [],
+    },
+    {
+      path: '/otabek996-REACT2025Q3/characters',
+      element: <CharactersPage />,
+      children: [
+        {
+          path: '?details=:id',
+          element: <CharacterDetail />,
+          children: [],
+        },
+      ],
     },
   ];
 
@@ -33,7 +43,7 @@ function App() {
     <ErrorBoundary>
       <Navbar />
       <Routes>
-        {routes.map((route, index) => {
+        {/* {routes.map((route, index) => {
           if (route.path === '/otabek996-REACT2025Q3/characters') {
             return (
               <Route key={index} path={route.path} element={route.element}>
@@ -45,6 +55,22 @@ function App() {
               <Route key={index} path={route.path} element={route.element} />
             );
           }
+        })} */}
+
+        {routes.map((route, index) => {
+          return (
+            <Route key={index} path={route.path} element={route.element}>
+              {route.children.map((child, indexer) => {
+                return (
+                  <Route
+                    key={indexer}
+                    path={child.path}
+                    element={child.element}
+                  />
+                );
+              })}
+            </Route>
+          );
         })}
       </Routes>
       <Footer />
