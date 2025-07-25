@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Outlet } from 'react-router-dom';
+import { fetchCharacters, fetchCharactersPagination } from '../../api/api';
+import { type Character } from '../../ts/interfaces/interfaces';
 import SearchSection from '../../components/SearchSection/SearchSection';
 import CardSection from '../../components/CardSection/CardSection';
 import ErrorButton from '../../components/ErrorButton/ErrorButton';
 import Loader from '../../components/Loader/Loader';
 import Pagination from '../../components/Pagination/Pagination';
-import { fetchCharacters, fetchCharactersPagination } from '../../api/api';
-import { type Character } from '../../ts/interfaces/interfaces';
+import CharacterDetail from '../../components/CharacterDetail/CharacterDetail';
 
 function CharactersPage() {
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -18,6 +19,8 @@ function CharactersPage() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
+  const detailsId = Number(searchParams.get('details'));
 
   const fetchData = async (
     searchValue: string | undefined,
@@ -119,6 +122,10 @@ function CharactersPage() {
       {loading && <Loader />}
       {error && <div className="text-red-500 text-center my-4">{error}</div>}
       <CardSection characters={characters} />
+      <Outlet />
+      {Number(detailsId) > 0 && (
+        <CharacterDetail characterId={Number(detailsId)} />
+      )}
       <Pagination
         currentPage={currentPage}
         totalPages={pages}

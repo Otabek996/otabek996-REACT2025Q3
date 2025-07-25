@@ -1,5 +1,4 @@
 import type { Character } from '../../ts/interfaces/interfaces';
-import { Outlet } from 'react-router-dom';
 import Card from '../Card/Card';
 
 interface Props {
@@ -17,9 +16,6 @@ function CardSection({ characters }: Props) {
         {characters.map((character) => (
           <Card key={character.id} character={character} />
         ))}
-      </div>
-      <div>
-        <Outlet />
       </div>
     </section>
   );

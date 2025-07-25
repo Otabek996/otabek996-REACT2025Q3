@@ -4,7 +4,7 @@ import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import PageNotFound from './pages/404/404';
-import CharacterDetail from './components/CharacterDetail/CharacterDetail';
+// import CharacterDetail from './components/CharacterDetail/CharacterDetail';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import './App.css';
@@ -32,8 +32,8 @@ function App() {
       children: [
         {
           path: '?details=:id',
-          element: <CharacterDetail />,
-          children: [],
+          // element: <CharacterDetail />,
+          element: <></>,
         },
       ],
     },
@@ -43,20 +43,6 @@ function App() {
     <ErrorBoundary>
       <Navbar />
       <Routes>
-        {/* {routes.map((route, index) => {
-          if (route.path === '/otabek996-REACT2025Q3/characters') {
-            return (
-              <Route key={index} path={route.path} element={route.element}>
-                <Route path="character/:id" element={<CharacterDetail />} />
-              </Route>
-            );
-          } else {
-            return (
-              <Route key={index} path={route.path} element={route.element} />
-            );
-          }
-        })} */}
-
         {routes.map((route, index) => {
           return (
             <Route key={index} path={route.path} element={route.element}>
