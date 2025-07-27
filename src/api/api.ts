@@ -3,14 +3,18 @@ import type {
   Character,
 } from '../ts/interfaces/interfaces';
 
-const BASE_URL = import.meta.env.VITE_RICK_AND_MORTY_BASE_URL;
+function getBaseUrl(): string {
+  const rawUrl = import.meta.env.VITE_RICK_AND_MORTY_BASE_URL;
+  if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) {
+    throw new Error('API URL is not defined in environment variables');
+  }
+  return rawUrl.trim();
+}
 
 export async function fetchCharacters(
   name = ''
 ): Promise<ApiResponseCharacter> {
-  if (!BASE_URL) {
-    throw new Error('API URL is not defined in environment variables');
-  }
+  const BASE_URL = getBaseUrl();
 
   const url = name
     ? `${BASE_URL}/character?name=${name}`
@@ -40,9 +44,7 @@ export async function fetchCharactersPagination(
 }
 
 export async function fetchCharacterById(id: string): Promise<Character> {
-  if (!BASE_URL) {
-    throw new Error('API URL is not defined in environment variables');
-  }
+  const BASE_URL = getBaseUrl();
 
   const response = await fetch(`${BASE_URL}/character/${id}`);
 
