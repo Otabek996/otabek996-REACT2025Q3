@@ -41,10 +41,38 @@ const mockResponse: ApiResponseCharacter = {
 const CharacterDetail = () => <div>Character Detail</div>;
 
 describe('CharactersPage', () => {
-  let storedSearchValue = '';
-
   beforeEach(() => {
-    vi.mocked(api.fetchCharactersPagination).mockResolvedValue(mockResponse);
+    let storedSearchValue = '';
+
+    // Mock fetchCharactersPagination with proper URL handling
+    vi.mocked(api.fetchCharactersPagination).mockImplementation(async (url) => {
+      const apiBaseUrl = 'https://rickandmortyapi.com/api';
+      const mockApiUrl = `${apiBaseUrl}/character`;
+
+      const urlObj = new URL(url);
+      const page = urlObj.searchParams.get('page') || '1';
+      const search = urlObj.searchParams.get('name') || '';
+
+      return {
+        ...mockResponse,
+        info: {
+          ...mockResponse.info,
+          next:
+            page === '1'
+              ? `${mockApiUrl}?page=2${search ? `&name=${search}` : ''}`
+              : `${mockApiUrl}?page=3${search ? `&name=${search}` : ''}`,
+          prev:
+            page === '2'
+              ? `${mockApiUrl}?page=1${search ? `&name=${search}` : ''}`
+              : null,
+        },
+        results: search
+          ? mockCharacters.filter((char) => char.name.includes(search))
+          : mockCharacters,
+      };
+    });
+
+    // Keep the other mocks unchanged
     vi.mocked(api.fetchCharacters).mockResolvedValue(mockResponse);
     vi.mocked(useSearchLocalStorage).mockReturnValue({
       searchValue: storedSearchValue,
@@ -128,5 +156,25 @@ describe('CharactersPage', () => {
     await waitFor(() =>
       expect(screen.getByText(/No characters found/i)).toBeInTheDocument()
     );
+  });
+
+  it('handles pagination controls', async () => {
+    renderPage([`${baseRoute}?page=2`]);
+    await waitFor(() => screen.getByText('Rick Sanchez'));
+
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    fireEvent.click(nextButton);
+
+    await waitFor(() => {
+      expect(api.fetchCharactersPagination).toHaveBeenCalled();
+      const lastCall = vi
+        .mocked(api.fetchCharactersPagination)
+        .mock.calls.at(-1)?.[0];
+      expect(lastCall).toBeDefined();
+
+      // Check if the URL contains the expected page parameter
+      const urlObj = new URL(lastCall as string);
+      expect(urlObj.searchParams.get('page')).toBe('2');
+    });
   });
 });
