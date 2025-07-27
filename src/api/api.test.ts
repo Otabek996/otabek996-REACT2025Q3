@@ -9,7 +9,6 @@ import type {
   Character,
 } from '../ts/interfaces/interfaces';
 
-// Mock global fetch
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
@@ -54,7 +53,6 @@ describe('API Functions', () => {
     vi.unstubAllEnvs();
   });
 
-  // fetchCharacters
   describe('fetchCharacters', () => {
     it('fetches all characters without name', async () => {
       mockFetch.mockResolvedValueOnce({
@@ -110,7 +108,6 @@ describe('API Functions', () => {
     });
   });
 
-  // fetchCharactersPagination
   describe('fetchCharactersPagination', () => {
     it('fetches characters with full URL', async () => {
       mockFetch.mockResolvedValueOnce({
@@ -146,7 +143,6 @@ describe('API Functions', () => {
     });
   });
 
-  // fetchCharacterById
   describe('fetchCharacterById', () => {
     it('fetches character by ID', async () => {
       mockFetch.mockResolvedValueOnce({
