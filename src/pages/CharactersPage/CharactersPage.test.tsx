@@ -1,159 +1,132 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import CharactersPage from '../CharactersPage/CharactersPage';
-import type { Character } from '../../ts/interfaces/interfaces';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import CharactersPage from './CharactersPage';
 import * as api from '../../api/api';
+import { useSearchLocalStorage } from '../../hooks/useSearchLocalStorage';
+import type {
+  Character,
+  ApiResponseCharacter,
+} from '../../ts/interfaces/interfaces';
 
-vi.mock('../src/components/SearchSection/SearchSection', () => ({
-  default: ({ fetchData }: { fetchData: (value: string) => void }) => (
-    <div>
-      <button onClick={() => fetchData('rick')}>Search Rick</button>
-    </div>
-  ),
-}));
+vi.mock('../../api/api');
+vi.mock('../../hooks/useSearchLocalStorage');
 
-vi.mock('../src/components/CardSection/CardSection', () => ({
-  default: ({ characters }: { characters: Character[] }) => (
-    <ul>
-      {characters.map((char) => (
-        <li key={char.id}>{char.name}</li>
-      ))}
-    </ul>
-  ),
-}));
+const mockCharacters: Character[] = [
+  {
+    id: 1,
+    name: 'Rick Sanchez',
+    status: 'Alive',
+    species: 'Human',
+    type: '',
+    gender: 'Male',
+    origin: { name: 'Earth', url: '' },
+    location: { name: 'Earth', url: '' },
+    image: 'rick.png',
+    episode: ['https://api.com/episode/1'],
+    url: '',
+  },
+];
 
-vi.mock('../src/components/Loader/Loader', () => ({
-  default: () => <div data-testid="loader">Loading...</div>,
-}));
+const mockResponse: ApiResponseCharacter = {
+  info: {
+    count: 2,
+    pages: 2,
+    next: 'https://api.com?page=3',
+    prev: 'https://api.com?page=1',
+  },
+  results: mockCharacters,
+};
 
-vi.mock('../src/components/ErrorButton/ErrorButton', () => ({
-  default: () => <button>ErrorButton</button>,
-}));
-
-vi.mock('../src/components/Pagination/Pagination', () => ({
-  default: () => <div data-testid="pagination">Pagination Component</div>,
-}));
-
-vi.stubEnv('VITE_RICK_AND_MORTY_BASE_URL', 'https://example.com/api');
-
-beforeEach(() => {
-  vi.restoreAllMocks();
-});
+const CharacterDetail = () => <div>Character Detail</div>;
 
 describe('CharactersPage', () => {
-  // it('renders characters fetched from API', async () => {
-  //   const mockCharacter: Character = {
-  //     id: 1,
-  //     name: 'Rick Sanchez',
-  //     status: 'Alive',
-  //     species: 'Human',
-  //     type: '',
-  //     gender: 'Male',
-  //     origin: { name: 'Earth', url: '' },
-  //     location: { name: 'Earth', url: '' },
-  //     image: 'rick.png',
-  //     episode: [],
-  //     url: '',
-  //     created: '',
-  //   };
+  let storedSearchValue = '';
 
-  //   vi.spyOn(api, 'fetchCharacters').mockResolvedValue({
-  //     results: [mockCharacter],
-  //     info: {
-  //       next: 'next-url',
-  //       prev: null,
-  //       pages: 3,
-  //       count: 60,
-  //     },
-  //   });
-
-  //   render(
-  //     <MemoryRouter>
-  //       <CharactersPage />
-  //     </MemoryRouter>
-  //   );
-
-  //   expect(screen.getByTestId('loader')).toBeInTheDocument();
-
-  //   await waitFor(() => {
-  //     expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
-  //   });
-
-  //   expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
-  //   expect(screen.getByTestId('pagination')).toBeInTheDocument();
-  // });
-
-  it('handles API error gracefully', async () => {
-    vi.spyOn(api, 'fetchCharacters').mockRejectedValue(new Error('API Error'));
-
-    render(
-      <MemoryRouter>
-        <CharactersPage />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('API Error')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.mocked(api.fetchCharactersPagination).mockResolvedValue(mockResponse);
+    vi.mocked(api.fetchCharacters).mockResolvedValue(mockResponse);
+    vi.mocked(useSearchLocalStorage).mockReturnValue({
+      searchValue: storedSearchValue,
+      updateSearchValue: vi.fn((value) => {
+        storedSearchValue = value;
+      }),
+      cleaneSearchValue: vi.fn(() => {
+        storedSearchValue = '';
+      }),
+      getStoredSearchValue: vi.fn(() => storedSearchValue),
     });
   });
 
-  // it('updates characters on search', async () => {
-  //   const summer: Character = {
-  //     id: 1,
-  //     name: 'Summer',
-  //     status: 'Alive',
-  //     species: 'Human',
-  //     type: '',
-  //     gender: 'Female',
-  //     origin: { name: 'Earth', url: '' },
-  //     location: { name: 'Earth', url: '' },
-  //     image: 'summer.png',
-  //     episode: [],
-  //     url: '',
-  //     created: '',
-  //   };
+  const baseRoute = '/otabek996-REACT2025Q3/characters';
+  const renderPage = (initialEntries = [`${baseRoute}`]) => {
+    render(
+      <MemoryRouter initialEntries={initialEntries}>
+        <Routes>
+          <Route path={`${baseRoute}/*`} element={<CharactersPage />}>
+            <Route path="character/:id" element={<CharacterDetail />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+  };
 
-  //   const rick: Character = {
-  //     id: 2,
-  //     name: 'Rick Sanchez',
-  //     status: 'Alive',
-  //     species: 'Human',
-  //     type: '',
-  //     gender: 'Male',
-  //     origin: { name: 'Earth', url: '' },
-  //     location: { name: 'Earth', url: '' },
-  //     image: 'rick.png',
-  //     episode: [],
-  //     url: '',
-  //     created: '',
-  //   };
+  it('renders loading state initially', async () => {
+    renderPage();
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByTestId('loader')).not.toBeInTheDocument()
+    );
+  });
 
-  //   vi.spyOn(api, 'fetchCharacters')
-  //     .mockResolvedValueOnce({
-  //       results: [summer],
-  //       info: { next: null, prev: null, pages: 1, count: 20 },
-  //     })
-  //     .mockResolvedValueOnce({
-  //       results: [rick],
-  //       info: { next: null, prev: null, pages: 1, count: 20 },
-  //     });
+  it('renders character cards after fetch', async () => {
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByText('Rick Sanchez')).toBeInTheDocument()
+    );
+  });
 
-  //   render(
-  //     <MemoryRouter>
-  //       <CharactersPage />
-  //     </MemoryRouter>
-  //   );
+  it('displays an error when fetch fails', async () => {
+    vi.mocked(api.fetchCharactersPagination).mockRejectedValueOnce(
+      new Error('Fetch failed')
+    );
+    renderPage([`${baseRoute}?page=2&search=Rick`]);
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('Summer')).toBeInTheDocument();
-  //   });
+    await waitFor(() =>
+      expect(screen.getByText('Fetch failed')).toBeInTheDocument()
+    );
+  });
 
-  //   const searchButton = await screen.findByText('Search');
-  //   searchButton.click();
+  it('handles search input', async () => {
+    renderPage();
+    await waitFor(() => screen.getByText('Rick Sanchez'));
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
-  //   });
-  // });
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'Rick' } });
+
+    const button = screen.getByRole('button', { name: /search/i });
+    fireEvent.click(button);
+
+    await waitFor(() =>
+      expect(api.fetchCharactersPagination).toHaveBeenCalledWith(
+        expect.stringContaining('name=Rick')
+      )
+    );
+  });
+
+  it('displays outlet when character detail route is active', async () => {
+    renderPage([`${baseRoute}/character/1`]);
+    expect(screen.getByText('Character Detail')).toBeInTheDocument();
+  });
+
+  it('handles empty character results', async () => {
+    vi.mocked(api.fetchCharactersPagination).mockResolvedValue({
+      info: { count: 0, pages: 0, next: null, prev: null },
+      results: [],
+    });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByText(/No characters found/i)).toBeInTheDocument()
+    );
+  });
 });
