@@ -10,12 +10,18 @@ function Card({ character }: Props) {
   const [searchParams] = useSearchParams();
 
   const handleOpenCard = () => {
-    const currentPage = parseInt(searchParams.get('page') || '1', 10);
+    const currentParams = searchParams.toString();
+    const separator = currentParams ? '?' : '';
 
     if (character.id <= 20) {
-      navigate(`?details=${character.id}`);
+      navigate(`character/${character.id}${separator}${currentParams}`);
     } else {
-      navigate(`?page=${currentPage}&details=${character.id}`);
+      const currentPage = parseInt(searchParams.get('page') || '1', 10);
+      const newParams = new URLSearchParams(searchParams);
+      if (!newParams.has('page') && currentPage > 1) {
+        newParams.set('page', currentPage.toString());
+      }
+      navigate(`character/${character.id}?${newParams.toString()}`);
     }
   };
 

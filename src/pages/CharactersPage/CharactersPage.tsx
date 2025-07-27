@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, Outlet } from 'react-router-dom';
-import { fetchCharacters, fetchCharactersPagination } from '../../api/api';
-import { type Character } from '../../ts/interfaces/interfaces';
+import {
+  useSearchParams,
+  useLocation,
+  useNavigate,
+  Outlet,
+} from 'react-router-dom';
 import SearchSection from '../../components/SearchSection/SearchSection';
 import CardSection from '../../components/CardSection/CardSection';
 import ErrorButton from '../../components/ErrorButton/ErrorButton';
 import Loader from '../../components/Loader/Loader';
 import Pagination from '../../components/Pagination/Pagination';
-import CharacterDetail from '../../components/CharacterDetail/CharacterDetail';
+import { fetchCharacters, fetchCharactersPagination } from '../../api/api';
+import { type Character } from '../../ts/interfaces/interfaces';
 
 function CharactersPage() {
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -18,9 +22,14 @@ function CharactersPage() {
   const [pages, setPages] = useState<number>(0);
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  const detailsId = Number(searchParams.get('details'));
+  // Check if we're showing character details
+  const isShowingDetails = location.pathname.includes('/character/');
+
+  // ... keep all your existing functions (fetchData, updateUrl, handlePageChange, etc.)
 
   const fetchData = async (
     searchValue: string | undefined,
@@ -63,13 +72,19 @@ function CharactersPage() {
     }
   };
 
+  const navigateToBaseRoute = (params: URLSearchParams) => {
+    const baseRoute = '/otabek996-REACT2025Q3/characters';
+    const queryString = params.toString();
+    const fullUrl = queryString ? `${baseRoute}?${queryString}` : baseRoute;
+    navigate(fullUrl);
+  };
+
   const updateUrl = (pageNumber: number, searchValue?: string) => {
     const newParams = new URLSearchParams(searchParams);
 
     if (pageNumber === 1) {
       newParams.delete('page');
     } else {
-      newParams.delete('details');
       newParams.set('page', pageNumber.toString());
     }
 
@@ -82,6 +97,7 @@ function CharactersPage() {
     }
 
     setSearchParams(newParams);
+    navigateToBaseRoute(newParams);
   };
 
   const handlePageChange = (pageNumber: number) => {
@@ -117,27 +133,31 @@ function CharactersPage() {
   }, [searchParams]);
 
   return (
-    <div>
-      <SearchSection fetchData={handleSearch} />
-      {loading && <Loader />}
-      {error && <div className="text-red-500 text-center my-4">{error}</div>}
-      <CardSection characters={characters} />
-      <Outlet />
-      {Number(detailsId) > 0 && (
-        <CharacterDetail characterId={Number(detailsId)} />
+    <div className="flex">
+      <div className={isShowingDetails ? 'flex-1' : 'w-full'}>
+        <SearchSection fetchData={handleSearch} />
+        {loading && <Loader />}
+        {error && <div className="text-red-500 text-center my-4">{error}</div>}
+        <CardSection characters={characters} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={pages}
+          onPageChange={handlePageChange}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          hasNext={!!nextUrl}
+          hasPrevious={!!prevUrl}
+          loading={loading}
+          showPageInfo={true}
+        />
+        <ErrorButton />
+      </div>
+
+      {isShowingDetails && (
+        <div className="w-80 bg-transparent overflow-y-auto">
+          <Outlet />
+        </div>
       )}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={pages}
-        onPageChange={handlePageChange}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        hasNext={!!nextUrl}
-        hasPrevious={!!prevUrl}
-        loading={loading}
-        showPageInfo={true}
-      />
-      <ErrorButton />
     </div>
   );
 }

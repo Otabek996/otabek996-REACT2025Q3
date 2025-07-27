@@ -1,38 +1,65 @@
-// import { useParams } from 'react-router-dom';
-// import { useEffect, useState } from 'react';
-// import type { Character } from '../../ts/interfaces/interfaces';
-// import { fetchCharacterById } from '../../api/api';
-// import Loader from '../Loader/Loader';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import type { Character } from '../../ts/interfaces/interfaces';
+import { fetchCharacterById } from '../../api/api';
+import Loader from '../Loader/Loader';
 
-interface Props {
-  characterId: number;
-}
+function CharacterDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-function CharacterDetail({ characterId }: Props) {
-  // const { id } = useParams<{ id: string }>();
-  // const [character, setCharacter] = useState<Character | null>(null);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
+  const handleClose = () => {
+    navigate('..');
+  };
 
-  // useEffect(() => {
-  //   if (!id) return;
+  useEffect(() => {
+    if (!id) return;
 
-  //   data = await fetchCharacterById(id)
-  //     .then(setCharacter)
-  //     .catch((err) => {
-  //       setError(err.message || 'Failed to fetch character');
-  //       setCharacter(null);
-  //     })
-  //     .finally(() => setLoading(false));
-  // }, [id]);
+    fetchCharacterById(id)
+      .then(setCharacter)
+      .catch((err) => {
+        setError(err.message || 'Failed to fetch character');
+        setCharacter(null);
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  // const fetchDataCharacter = async ()
+  if (loading)
+    return (
+      <div className="p-4">
+        <Loader />
+      </div>
+    );
+  if (error) return <div className="text-red-500 p-4">Error: {error}</div>;
+  if (!character) return <div className="p-4">Character not found</div>;
 
-  // if (loading) return <Loader />;
-  // if (error) return <div className="text-red-500">Error: {error}</div>;
-  // if (!character) return <div>Character not found</div>;
+  return (
+    <div className="p-4 bg-transparent">
+      <button
+        onClick={handleClose}
+        className="absolute top-28 right-40 text-xl hover:text-red-500"
+      >
+        ×
+      </button>
 
-  return <h1>Character Details {characterId}</h1>;
+      <div className="mt-15">
+        <img
+          src={character.image}
+          alt={character.name}
+          className="w-full mb-4"
+        />
+        <h2 className="text-lg font-semibold">{character.name}</h2>
+        <p>Status: {character.status}</p>
+        <p>Species: {character.species}</p>
+        <p>Gender: {character.gender}</p>
+        <p>Origin: {character.origin.name}</p>
+        <p>Location: {character.location.name}</p>
+      </div>
+    </div>
+  );
 }
 
 export default CharacterDetail;

@@ -4,7 +4,7 @@ import CharactersPage from './pages/CharactersPage/CharactersPage';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import PageNotFound from './pages/404/404';
-// import CharacterDetail from './components/CharacterDetail/CharacterDetail';
+import CharacterDetail from './components/CharacterDetail/CharacterDetail';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import './App.css';
@@ -31,9 +31,8 @@ function App() {
       element: <CharactersPage />,
       children: [
         {
-          path: '?details=:id',
-          // element: <CharacterDetail />,
-          element: <></>,
+          path: 'character/:id',
+          element: <CharacterDetail />,
         },
       ],
     },
