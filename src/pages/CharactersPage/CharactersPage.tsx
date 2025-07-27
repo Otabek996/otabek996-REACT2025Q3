@@ -12,6 +12,7 @@ import Loader from '../../components/Loader/Loader';
 import Pagination from '../../components/Pagination/Pagination';
 import { fetchCharacters, fetchCharactersPagination } from '../../api/api';
 import { type Character } from '../../ts/interfaces/interfaces';
+import { useSearchLocalStorage } from '../../hooks/useSearchLocalStorage';
 
 function CharactersPage() {
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -26,10 +27,9 @@ function CharactersPage() {
   const navigate = useNavigate();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  // Check if we're showing character details
   const isShowingDetails = location.pathname.includes('/character/');
 
-  // ... keep all your existing functions (fetchData, updateUrl, handlePageChange, etc.)
+  const { updateSearchValue, getStoredSearchValue } = useSearchLocalStorage();
 
   const fetchData = async (
     searchValue: string | undefined,
@@ -119,13 +119,11 @@ function CharactersPage() {
   const handleSearch = (searchValue: string | undefined) => {
     updateUrl(1, searchValue);
 
-    if (searchValue !== undefined) {
-      localStorage.setItem('searchValue', searchValue);
-    }
+    updateSearchValue(searchValue);
   };
 
   useEffect(() => {
-    const savedSearch = localStorage.getItem('searchValue') || '';
+    const savedSearch = getStoredSearchValue();
     const searchFromUrl = searchParams.get('search') || savedSearch;
     const pageFromUrl = Math.max(1, currentPage);
 
