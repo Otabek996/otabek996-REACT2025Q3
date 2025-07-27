@@ -14,9 +14,6 @@ function Footer() {
                 src="/otabek996-REACT2025Q3/the-rolling-scopes-school-logo.svg"
                 alt="The Rolling Scopes School Logo"
                 className="h-8 w-auto"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
               />
               <div
                 className="h-8 w-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm hidden"
