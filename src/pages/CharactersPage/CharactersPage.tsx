@@ -132,7 +132,15 @@ function CharactersPage() {
 
   return (
     <div className="flex">
-      <div className={isShowingDetails ? 'flex-1' : 'w-full'}>
+      <div
+        className={isShowingDetails ? 'flex-1' : 'w-full'}
+        onClick={() => {
+          if (isShowingDetails) {
+            const currentParams = new URLSearchParams(searchParams);
+            navigateToBaseRoute(currentParams);
+          }
+        }}
+      >
         <SearchSection fetchData={handleSearch} />
         {loading && <Loader />}
         {error && <div className="text-red-500 text-center my-4">{error}</div>}
