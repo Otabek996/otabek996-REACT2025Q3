@@ -1,23 +1,20 @@
-import { Component } from 'react';
-import type { ReactNode } from 'react';
+import { useState } from 'react';
 import Button from '../Button/Button';
 
-class ErrorButton extends Component {
-  state = { hasError: false };
+function ErrorButton() {
+  const [hasError, setHasError] = useState(false);
 
-  render(): ReactNode {
-    if (this.state.hasError) {
-      throw new Error('This is a fallback UI Error test');
-    } else {
-      return (
-        <Button
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-          buttonText="Throw&nbsp;Error"
-          callback={() => this.setState({ hasError: true })}
-        />
-      );
-    }
+  if (hasError) {
+    throw new Error('This is a fallback UI Error test');
   }
+
+  return (
+    <Button
+      className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+      buttonText="Throw Error"
+      callback={() => setHasError(true)}
+    />
+  );
 }
 
 export default ErrorButton;

@@ -1,57 +1,66 @@
-import { Component } from 'react';
-import SearchSection from './components/SearchSection/SearchSection';
-import CardSection from './components/CardSection/CardSection';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import ErrorButton from './components/ErrorButton/ErrorButton';
-import Loader from './components/Loader/Loader';
-import { fetchCharacters } from './api/api';
-import { type Character } from './ts/interfaces/interfaces';
+import { Routes, Route } from 'react-router-dom';
+import CharactersPage from './pages/CharactersPage/CharactersPage';
+import HomePage from './pages/HomePage/HomePage';
+import AboutPage from './pages/AboutPage/AboutPage';
+import PageNotFound from './pages/404/404';
+import CharacterDetail from './components/CharacterDetail/CharacterDetail';
+import Navbar from './components/Navbar/Navbar';
+import Footer from './components/Footer/Footer';
 import './App.css';
 
-interface State {
-  characters: Character[];
-  loading: boolean;
-  error: string | null;
-}
+function App() {
+  const routes = [
+    {
+      path: '*',
+      element: <PageNotFound />,
+      children: [],
+    },
+    {
+      path: '/otabek996-REACT2025Q3',
+      element: <HomePage />,
+      children: [],
+    },
+    {
+      path: '/otabek996-REACT2025Q3/about',
+      element: <AboutPage />,
+      children: [],
+    },
+    {
+      path: '/otabek996-REACT2025Q3/characters',
+      element: <CharactersPage />,
+      children: [
+        {
+          path: 'character/:id',
+          element: <CharacterDetail />,
+        },
+      ],
+    },
+  ];
 
-class App extends Component<object, State> {
-  state: State = {
-    characters: [],
-    loading: false,
-    error: null,
-  };
-
-  fetchData = async (searchValue: string | undefined) => {
-    try {
-      this.setState({ loading: true, error: null });
-      const data = await fetchCharacters(searchValue);
-      this.setState({ characters: data.results });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      this.setState({ characters: [], error: message });
-    } finally {
-      this.setState({ loading: false });
-    }
-  };
-
-  componentDidMount(): void {
-    const savedSearch = localStorage.getItem('searchValue') || '';
-    this.fetchData(savedSearch);
-  }
-
-  render() {
-    const { characters, loading, error } = this.state;
-
-    return (
-      <ErrorBoundary>
-        <SearchSection fetchData={this.fetchData} />
-        {loading && <Loader />}
-        {error && <div className="text-red-500 text-center">{error}</div>}
-        <CardSection characters={characters} />
-        <ErrorButton />
-      </ErrorBoundary>
-    );
-  }
+  return (
+    <ErrorBoundary>
+      <Navbar />
+      <Routes>
+        {routes.map((route, index) => {
+          return (
+            <Route key={index} path={route.path} element={route.element}>
+              {route.children.map((child, indexer) => {
+                return (
+                  <Route
+                    key={indexer}
+                    path={child.path}
+                    element={child.element}
+                  />
+                );
+              })}
+            </Route>
+          );
+        })}
+      </Routes>
+      <Footer />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

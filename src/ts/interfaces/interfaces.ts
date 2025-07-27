@@ -11,18 +11,12 @@ export interface Character {
   species: string;
   type: string;
   gender: string;
-  origin: {
-    name: string;
-    url: string;
-  };
-  location: {
-    name: string;
-    url: string;
-  };
+  origin: { name: string; url: string };
+  location: { name: string; url: string };
   image: string;
   episode: string[];
   url: string;
-  created: string;
+  created?: string;
 }
 
 export interface Location {
@@ -81,4 +75,16 @@ export interface StateLocation extends State {
 
 export interface StateEpisode extends State {
   episode: Episode[];
+}
+
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  loading?: boolean;
+  showPageInfo?: boolean;
 }
